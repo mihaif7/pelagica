@@ -51,6 +51,12 @@ func main() {
 		Mac: application.MacOptions{
 			ApplicationShouldTerminateAfterLastWindowClosed: true,
 		},
+		Windows: application.WindowsOptions{
+			// WebView2 blocks autoplay without a user gesture by default, which stops
+			// playback starting on navigation (next episode, resume). The macOS
+			// equivalent is EnableAutoplayWithoutUserAction on the window below.
+			AdditionalBrowserArgs: []string{"--autoplay-policy=no-user-gesture-required"},
+		},
 		// Last chance to persist the window geometry: the debounced write may still
 		// be pending when the user quits.
 		OnShutdown: stateTracker.flush,
@@ -75,6 +81,13 @@ func main() {
 			InvisibleTitleBarHeight: 50,
 			WebviewPreferences: application.MacWebviewPreferences{
 				FullscreenEnabled: application.Enabled,
+				// WKWebView requires a user gesture before media plays, which stops
+				// playback starting on navigation (next episode, resume).
+				EnableAutoplayWithoutUserAction: application.Enabled,
+				// Puts the AirPlay route button in the native media controls.
+				AllowsAirPlayForMediaPlayback: application.Enabled,
+				// Without this the UA ends in the framework default ("wails.io").
+				ApplicationNameForUserAgent: "Pelagica",
 			},
 		},
 	}

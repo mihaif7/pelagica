@@ -56,6 +56,10 @@ export function getPlatform(): Platform {
     return platform;
 }
 
+export function getClientVersion(): string {
+    return clientVersion;
+}
+
 export function getPlatformCapabilities(): PlatformCapabilities {
     return PLATFORM_CAPABILITIES[platform];
 }

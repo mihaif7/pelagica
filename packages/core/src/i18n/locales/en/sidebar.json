@@ -4,6 +4,7 @@
     "library": "Library",
     "music": "Music",
     "live": "Live",
+    "update_available": "Update available: {{version}}",
     "theme": "Theme",
     "light": "Light",
     "dark": "Dark",

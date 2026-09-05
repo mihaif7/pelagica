@@ -1,7 +1,7 @@
 import { Jellyfin } from '@jellyfin/sdk';
 import { getDeviceId } from '../utils/deviceId';
 
-export type Platform = 'web' | 'tizen' | 'webos';
+export type Platform = 'web' | 'tizen' | 'webos' | 'desktop';
 
 export interface PlatformCapabilities {
     /** Direct-play containers this platforms player supports beyond the browser default mp4/webm. */
@@ -23,11 +23,30 @@ const PLATFORM_CAPABILITIES: Record<Platform, PlatformCapabilities> = {
         extraDirectPlayContainers: [],
         extraDirectPlayAudioCodecs: [],
     },
+    // The desktop shell embeds the platform's own webview (WKWebView on macOS,
+    // WebView2 on Windows, WebKitGTK on Linux), so its playback support is the
+    // same as the browser's.
+    desktop: {
+        extraDirectPlayContainers: [],
+        extraDirectPlayAudioCodecs: [],
+    },
 };
+
+/** Names the OS the desktop shell is running on, for the Jellyfin device list. */
+function getDesktopOsName(): string {
+    const ua = navigator.userAgent;
+    if (ua.includes('Windows')) return 'Windows';
+    if (ua.includes('Macintosh')) return 'macOS';
+    if (ua.includes('Linux')) return 'Linux';
+    return 'Desktop';
+}
 
 function getBrowserName(): string {
     if (platform === 'tizen') return 'Samsung Smart TV';
     if (platform === 'webos') return 'LG webOS';
+    // The desktop shell's webview reports itself as Safari/Edge, which would put it
+    // in the device list as a browser, so name the OS it runs on instead.
+    if (platform === 'desktop') return getDesktopOsName();
 
     const ua = navigator.userAgent;
     if (ua.includes('Firefox/')) return 'Firefox';

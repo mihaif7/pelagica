@@ -9,7 +9,12 @@ export function isMacOS(): boolean {
     return typeof navigator !== 'undefined' && /Mac/i.test(navigator.userAgent);
 }
 
-const isDesktopBuild = import.meta.env.VITE_IS_DESKTOP_BUILD === 'true';
+/**
+ * True in the bundle built with `--mode desktop`, which is only ever embedded in
+ * the Wails binary. Build-time rather than runtime, so it is usable before the
+ * Wails runtime has injected `window._wails`.
+ */
+export const isDesktopBuild = import.meta.env.VITE_IS_DESKTOP_BUILD === 'true';
 
 /**
  * Intercepts a click on an external link and opens it in the user's default browser if the app is running in desktop mode.

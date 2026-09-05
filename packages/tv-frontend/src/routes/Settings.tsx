@@ -1,4 +1,10 @@
-import { clearCredentials, getServerUrl, useCurrentUser } from '@pelagica/core';
+import {
+    clearCredentials,
+    getClientVersion,
+    getServerUrl,
+    useCurrentUser,
+    useUpdateAvailable,
+} from '@pelagica/core';
 import i18n, { SUPPORTED_LANGUAGES } from '@pelagica/core/i18n';
 import { useTranslation } from 'react-i18next';
 import FocusableButton from '../components/FocusableButton';
@@ -10,7 +16,6 @@ import { cn } from '@/lib/utils';
 import { FOCUS_RING_LARGE } from '@/lib/focus-styles';
 import { useScrollIntoViewOnFocus } from '@/lib/use-scroll-into-view-on-focus';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import pkg from '../../package.json' with { type: 'json' };
 import { clearLogosCache } from '../lib/studio-logos';
 import { toast } from '../components/ui/toast';
 import { useQueryClient } from '@tanstack/react-query';
@@ -45,6 +50,7 @@ const Settings = () => {
     const queryClient = useQueryClient();
     const serverUrl = getServerUrl();
     const { data: user, isLoading } = useCurrentUser();
+    const { updateAvailable, latestVersion } = useUpdateAvailable(!!user?.Policy?.IsAdministrator);
     const navigate = useNavigate();
     const { ref: aboutRef, focused: aboutFocused } = useFocusable<object, HTMLDivElement>({});
     useScrollIntoViewOnFocus(aboutRef, aboutFocused);
@@ -122,8 +128,13 @@ const Settings = () => {
                     )}
                 >
                     <p className="text-muted-foreground">
-                        {t('settings:version_label')}: {pkg.version}
+                        {t('settings:version_label')}: {getClientVersion()}
                     </p>
+                    {updateAvailable && (
+                        <p className="text-red-500">
+                            {t('sidebar:update_available', { version: latestVersion })}
+                        </p>
+                    )}
                 </div>
             </SettingsSection>
         </div>

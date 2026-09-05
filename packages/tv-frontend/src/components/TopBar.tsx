@@ -1,4 +1,4 @@
-import { useConfig } from '@pelagica/core';
+import { useConfig, useCurrentUser, useUpdateAvailable } from '@pelagica/core';
 import { useTranslation } from 'react-i18next';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { House, Library, Search, Settings } from 'lucide-react';
@@ -13,6 +13,8 @@ export type { TopBarItem };
 const TopBar = ({ activeItem }: { activeItem?: TopBarItem }) => {
     const { t } = useTranslation(['sidebar', 'common', 'settings']);
     const { config } = useConfig();
+    const { data: user } = useCurrentUser();
+    const { updateAvailable } = useUpdateAvailable(!!user?.Policy?.IsAdministrator);
     const layerId = useLayerId();
 
     const { ref, focusKey } = useLayerFocusable<object, HTMLDivElement>({
@@ -75,7 +77,12 @@ const TopBar = ({ activeItem }: { activeItem?: TopBarItem }) => {
                                 focusKey={topBarFocusKey('settings', layerId)}
                                 active={activeItem === 'settings'}
                             >
-                                <Settings className="h-4 w-4" />
+                                <span className="relative flex">
+                                    <Settings className="h-4 w-4" />
+                                    {updateAvailable && (
+                                        <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-red-500 ring-2 ring-background" />
+                                    )}
+                                </span>
                                 {t('settings:title')}
                             </FocusableNavLink>
                         </nav>

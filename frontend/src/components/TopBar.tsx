@@ -7,6 +7,7 @@ import {
     ChevronLeft,
     ChevronRight,
     ChevronsUpDown,
+    CircleArrowUp,
     Copy,
     DotIcon,
     ExternalLink,
@@ -87,6 +88,7 @@ import { useUpdateUserConfiguration } from '@pelagica/core';
 import { useAuthorizeQuickConnect } from '@pelagica/core';
 import { useSeerrLoginStatus } from '@pelagica/core';
 import { useSeerrLogout } from '@pelagica/core';
+import { useUpdateAvailable } from '@pelagica/core';
 import { SeerrLoginDialog } from '@/components/SeerrLoginDialog';
 import { toast } from 'sonner';
 import { iso6392 } from 'iso-639-2';
@@ -313,6 +315,9 @@ const UserMenu = () => {
     const { config } = useConfig();
     const { data: isSeerrLoggedIn } = useSeerrLoginStatus();
     const seerrLogout = useSeerrLogout();
+    const { updateAvailable, latestVersion, releaseUrl } = useUpdateAvailable(
+        !!user?.Policy?.IsAdministrator
+    );
     const [appIconOptions, setAppIconOptions] = useState<string[]>([]);
     const [selectedAppIcon, setSelectedAppIcon] = useState<string | null>(null);
 
@@ -363,10 +368,17 @@ const UserMenu = () => {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="flex items-center gap-2 px-2">
-                    <Avatar className="h-6 w-6 rounded-lg">
-                        <AvatarImage src={profileImageUrl} alt={userName} />
-                        <AvatarFallback className="rounded-lg text-xs">{initials}</AvatarFallback>
-                    </Avatar>
+                    <span className="relative flex">
+                        <Avatar className="h-6 w-6 rounded-lg">
+                            <AvatarImage src={profileImageUrl} alt={userName} />
+                            <AvatarFallback className="rounded-lg text-xs">
+                                {initials}
+                            </AvatarFallback>
+                        </Avatar>
+                        {updateAvailable && (
+                            <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-amber-500" />
+                        )}
+                    </span>
                     <span className="hidden sm:block text-sm font-medium max-w-32 truncate">
                         {userName}
                     </span>
@@ -388,6 +400,22 @@ const UserMenu = () => {
                 </DropdownMenuLabel>
 
                 <DropdownMenuSeparator />
+
+                {/* Update notice */}
+                {updateAvailable && (
+                    <>
+                        <DropdownMenuItem asChild>
+                            <ExternalAnchor
+                                href={releaseUrl}
+                                className="flex items-center gap-2 text-amber-500 focus:text-amber-500"
+                            >
+                                <CircleArrowUp className="text-amber-500" />
+                                {t('update_available', { version: latestVersion })}
+                            </ExternalAnchor>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                    </>
+                )}
 
                 {/* Theme */}
                 <DropdownMenuSub>

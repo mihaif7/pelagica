@@ -35,6 +35,19 @@ func (s *WindowService) positionTrafficLights() {
 	})
 }
 
+// raise brings the existing window to the front. Called when a second instance is
+// launched, so the OS hands the user the window they already have instead of a new
+// process. Deliberately does not use Restore(), which would drop a window out of
+// fullscreen or maximised state mid-playback.
+func (s *WindowService) raise() {
+	if s.window == nil {
+		return
+	}
+	s.window.UnMinimise()
+	s.window.Show()
+	s.window.Focus()
+}
+
 // ToggleFullscreen toggles native window fullscreen.
 func (s *WindowService) ToggleFullscreen() {
 	s.window.ToggleFullscreen()

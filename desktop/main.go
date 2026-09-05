@@ -50,6 +50,12 @@ func main() {
 		// Last chance to persist the window geometry: the debounced write may still
 		// be pending when the user quits.
 		OnShutdown: stateTracker.flush,
+		SingleInstance: &application.SingleInstanceOptions{
+			UniqueID: "app.pelagica.desktop",
+			OnSecondInstanceLaunch: func(application.SecondInstanceData) {
+				windowService.raise()
+			},
+		},
 	})
 
 	windowOptions := application.WebviewWindowOptions{
